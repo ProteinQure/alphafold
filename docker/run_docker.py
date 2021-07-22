@@ -160,6 +160,9 @@ def main(argv):
   output_target_path = os.path.join(_ROOT_MOUNT_DIRECTORY, 'output')
   mounts.append(types.Mount(output_target_path, output_dir, type='bind'))
 
+  # Mount CUDA libraries from the host
+  mounts.append(types.Mount('/usr/local/cuda-11.1', '/usr/local/cuda-11.1', type='bind', read_only=True))
+ 
   command_args.extend([
       f'--output_dir={output_target_path}',
       f'--model_names={",".join(model_names)}',
@@ -179,6 +182,7 @@ def main(argv):
       mounts=mounts,
       environment={
           'NVIDIA_VISIBLE_DEVICES': FLAGS.gpu_devices,
+          'LD_LIBRARY_PATH': '/usr/local/cuda:/usr/local/cuda-11.1/lib64:/usr/local/nvidia/lib:/usr/local/nvidia/lib64'
           # The following flags allow us to make predictions on proteins that
           # would typically be too long to fit into GPU memory.
           'TF_FORCE_UNIFIED_MEMORY': '1',
